@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from starlette.responses import JSONResponse
 
+from src.minio_client import get_report_from_s3
 from src.report_client import get_report as get_service_report
 from src.database import select_all, insert, select_by_uuid, update, delete_by_uuid
 from src.models import Car
@@ -77,4 +78,18 @@ def delete(uuid: str):
 
 @app.get(path="/report/")
 def get_report():
-    return JSONResponse(status_code=200, content={"message": "success", "data": get_service_report()})
+    get_report_from_s3(
+        object_name=get_service_report()["data"],
+        filepath="report.json"
+    )
+
+    with open("report.json", "r", encoding="utf-8") as f:
+        data = f.read()
+
+    return JSONResponse(
+        status_code=200,
+        content={
+            "message": "success",
+            "data": data
+        }
+    )
