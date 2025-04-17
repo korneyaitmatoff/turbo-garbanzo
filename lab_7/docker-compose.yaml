@@ -1,0 +1,67 @@
+version: "3.8"
+services:
+  pg_database:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: test_database
+    volumes:
+      - /tmp/docker/pg_database:/tmp/pg_database
+    ports:
+      - "5432:5432"
+
+  api:
+    image: fastapi_lab
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: test_database
+      DB_HOST: pg_database
+      DB_PORT: 5432
+      REPORT_HOST: reports
+      REPORT_PORT: 8082
+      S3_HOST: minio
+      S3_PORT: 9000
+      ACCESS_KEY: 6UY177f4XBwz40sB6NMJ
+      SECRET_KEY: 6HaIpkOZ9CUvW4OqcqFJBnzZuKIs59FfPANMtKkf
+      RMQ_HOST: rabbitmq
+      RMQ_PORT: 5672
+    ports:
+      - "8081:8081"
+
+  reports:
+    image: reports_lab
+    restart: always
+    environment:
+      API_HOST: api
+      API_PORT: 8081
+      S3_HOST: minio
+      S3_PORT: 9000
+      ACCESS_KEY: 6UY177f4XBwz40sB6NMJ
+      SECRET_KEY: 6HaIpkOZ9CUvW4OqcqFJBnzZuKIs59FfPANMtKkf
+      RMQ_HOST: rabbitmq
+      RMQ_PORT: 5672
+
+  minio:
+    image: bitnami/minio:latest
+    environment:
+      MINIO_ROOT_USER: user
+      MINIO_ROOT_PASSWORD: password
+    volumes:
+      - /tmp/docker/s3:/tmp/s3
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
+  rabbitmq:
+    image: rabbitmq:3.8-rc-management
+    restart: always
+    ports:
+      - "15672:15672"
+      - "5671:5671"
+      - "5672:5672"
+    volumes:
+      - ./rabbitmq:/var/lib/rabbitmq
