@@ -14,6 +14,7 @@ def get_report():
             status_code=200,
             content={
                 "message": "success",
+                # "data": get_all_data()["data"]
                 "data": prepare_report(data=get_all_data()["data"])
             }
         )

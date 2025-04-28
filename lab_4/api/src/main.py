@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from starlette.responses import JSONResponse
 
 from src.minio_client import get_report_from_s3
@@ -76,20 +76,35 @@ def delete(uuid: str):
         return JSONResponse(status_code=500, content={"message": "fail", "data": str(e)})
 
 
-@app.get(path="/report/")
-def get_report():
-    get_report_from_s3(
-        object_name=get_service_report()["data"],
-        filepath="report.json"
+@app.get(path="/report/{path:path}")
+def get_report(request: Request, path: str):
+    from requests import Session
+
+    from src.config import (
+        REPORT_HOST,
+        REPORT_PORT
     )
 
-    with open("report.json", "r", encoding="utf-8") as f:
-        data = f.read()
+    try:
+        response = Session().request(
+            method=request.method,
+            url=f"http://{REPORT_HOST}:{REPORT_PORT}/{path}"
+        )
 
-    return JSONResponse(
-        status_code=200,
-        content={
-            "message": "success",
-            "data": data
-        }
-    )
+        get_report_from_s3(
+            object_name=response.json()["data"],
+            filepath="report.json"
+        )
+
+        with open("report.json", "r", encoding="utf-8") as f:
+            data = f.read()
+
+        return JSONResponse(
+            status_code=200,
+            content={
+                "message": "success",
+                "data": data
+            }
+        )
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"message": "fail", "data": str(e)})
