@@ -14,17 +14,20 @@ from src.models import Car
 connection = connect(
     dsn=f"postgres://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{DB_HOST}:{DB_PORT}/{POSTGRES_DB}"
 )
-cursor = connection.cursor()
 
 
 def select_all():
+    cursor = connection.cursor()
     cursor.execute(
         query="SELECT * FROM cars;"
     )
-    return cursor.fetchall()
+    data = cursor.fetchall()
+    cursor.close()
+    return data
 
 
 def insert(data: Car):
+    cursor = connection.cursor()
     cursor.execute(
         query=f"INSERT INTO cars(name, cost, is_writeoff, is_rented) "
               f"values ('{data.name}', {data.cost}, {data.is_writeoff}, {data.is_rented})"
@@ -33,10 +36,13 @@ def insert(data: Car):
 
 
 def select_by_uuid(uuid: str):
+    cursor = connection.cursor()
     cursor.execute(
         query=f"SELECT * FROM cars where id = '{uuid}';"
     )
-    return cursor.fetchall()
+    data = cursor.fetchall()
+    cursor.close()
+    return data
 
 
 def update(
@@ -54,14 +60,19 @@ def update(
 
     query = query[:-1] + f" WHERE id = '{uuid}'"
 
+    cursor = connection.cursor()
     cursor.execute(
         query=query
     )
     cursor.connection.commit()
+    cursor.close()
 
 
 def delete_by_uuid(uuid: str):
+    cursor = connection.cursor()
     cursor.execute(
         query=f"DELETE FROM cars where id = '{uuid}'"
     )
     cursor.connection.commit()
+
+    cursor.close()
