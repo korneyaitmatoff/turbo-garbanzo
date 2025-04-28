@@ -91,19 +91,19 @@ def get_report(request: Request, path: str):
             url=f"http://{REPORT_HOST}:{REPORT_PORT}/{path}"
         )
 
-        get_report_from_s3(
-            object_name=response.json()["data"],
-            filepath="report.json"
-        )
+        # get_report_from_s3(
+        #     object_name=response.json()["data"],
+        #     filepath="report.json"
+        # )
 
-        with open("report.json", "r", encoding="utf-8") as f:
-            data = f.read()
+        # with open("report.json", "r", encoding="utf-8") as f:
+        #     data = f.read()
 
         return JSONResponse(
             status_code=200,
             content={
                 "message": "success",
-                "data": data
+                "data": response.json()
             }
         )
     except Exception as e:
