@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from typing import TypedDict
 
 from psycopg2 import connect
@@ -12,32 +13,53 @@ from src.config import (
 )
 from src.models import Car
 
-connection = connect(
-    dsn=f"postgres://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{DB_HOST}:{DB_PORT}/{POSTGRES_DB}"
-)
-cursor = connection.cursor(cursor_factory=RealDictCursor)
+
+def connection():
+    return connect(
+        dsn=f"postgres://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{DB_HOST}:{DB_PORT}/{POSTGRES_DB}"
+    )
 
 
 def select_all():
-    cursor.execute(
-        query="SELECT * FROM cars;"
-    )
-    return cursor.fetchall()
+    cn = connection()
+    cursor = cn.cursor(cursor_factory=RealDictCursor)
+
+    cursor.execute(query="SELECT * FROM cars;")
+    data = cursor.fetchall()
+
+    cursor.close()
+    cn.close()
+
+    return data
 
 
 def insert(data: Car):
+    cn = connection()
+    cursor = cn.cursor(cursor_factory=RealDictCursor)
+
     cursor.execute(
         query=f"INSERT INTO cars(name, cost, is_writeoff, is_rented) "
               f"values ('{data.name}', {data.cost}, {data.is_writeoff}, {data.is_rented})"
     )
+
     cursor.connection.commit()
+    cursor.close()
+    cn.close()
 
 
 def select_by_uuid(uuid: str):
+    cn = connection()
+    cursor = cn.cursor(cursor_factory=RealDictCursor)
+
     cursor.execute(
         query=f"SELECT * FROM cars where id = '{uuid}';"
     )
-    return cursor.fetchall()
+    data = cursor.fetchall()
+
+    cursor.close()
+    cn.close()
+
+    return data
 
 
 def update(
@@ -55,14 +77,26 @@ def update(
 
     query = query[:-1] + f" WHERE id = '{uuid}'"
 
+    cn = connection()
+    cursor = cn.cursor(cursor_factory=RealDictCursor)
+
     cursor.execute(
         query=query
     )
     cursor.connection.commit()
 
+    cursor.close()
+    cn.close()
+
 
 def delete_by_uuid(uuid: str):
+    cn = connection()
+    cursor = cn.cursor(cursor_factory=RealDictCursor)
+
     cursor.execute(
         query=f"DELETE FROM cars where id = '{uuid}'"
     )
     cursor.connection.commit()
+
+    cursor.close()
+    cn.close()

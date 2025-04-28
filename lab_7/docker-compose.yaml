@@ -9,12 +9,16 @@ services:
       POSTGRES_DB: test_database
     volumes:
       - /tmp/docker/pg_database:/tmp/pg_database
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
 
   api:
     image: fastapi_lab
     restart: always
+    build:
+      context: ./api
+      dockerfile: Dockerfile_CRUD
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
@@ -35,6 +39,9 @@ services:
   reports:
     image: reports_lab
     restart: always
+    build:
+      context: ./reports
+      dockerfile: Dockerfile_REPORTS
     environment:
       API_HOST: api
       API_PORT: 8081
@@ -50,10 +57,10 @@ services:
     environment:
       MINIO_ROOT_USER: user
       MINIO_ROOT_PASSWORD: password
+      MINIO_DEFAULT_BUCKETS: reports
     volumes:
       - /tmp/docker/s3:/tmp/s3
     ports:
-      - "9000:9000"
       - "9001:9001"
 
   rabbitmq:
@@ -65,3 +72,14 @@ services:
       - "5672:5672"
     volumes:
       - ./rabbitmq:/var/lib/rabbitmq
+
+  locust:
+    image: locust_service
+    build:
+      context: ./locust
+      dockerfile: DockerfileLocust
+    environment:
+      API_HOST: api:8081
+    ports:
+      - "8083:8083"
+

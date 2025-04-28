@@ -15,7 +15,6 @@ from src.config import (
 
 def on_request(ch, method, props, body):
     print(f"Received request: {body.decode()}")
-    response = f"Processed: {body.decode()}"
 
     filename = f"report_{datetime.now()}.json"
     with open(filename, "w") as f:
@@ -42,10 +41,11 @@ try:
 
     channel.queue_declare(queue="events")
 
-    channel.basic_qos(prefetch_count=1)
+    # channel.basic_consume(prefetch_count=1)
     channel.basic_consume(queue="events", on_message_callback=on_request)
 
     print(" [x] Awaiting RPC requests")
     channel.start_consuming()
 except Exception as e:
+    print(e)
     print(f"Try connect to {RMQ_HOST}:{RMQ_PORT}")
