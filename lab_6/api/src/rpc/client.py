@@ -51,13 +51,3 @@ class RpcClient:
             self.connection.process_data_events()
 
         return self.response.decode()
-
-
-from src.config import RMQ_PORT, RMQ_HOST
-rpc_client = RpcClient(
-    host=RMQ_HOST,
-    port=RMQ_PORT
-)
-response = rpc_client.call(message=b"get_report")
-
-print(response)

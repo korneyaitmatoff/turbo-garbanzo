@@ -36,13 +36,16 @@ def on_request(ch, method, props, body):
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
-connection = pika.BlockingConnection(pika.ConnectionParameters(host=RMQ_HOST, port=RMQ_PORT))
-channel = connection.channel()
+try:
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RMQ_HOST, port=RMQ_PORT))
+    channel = connection.channel()
 
-channel.queue_declare(queue="events")
+    channel.queue_declare(queue="events")
 
-channel.basic_qos(prefetch_count=1)
-channel.basic_consume(queue="events", on_message_callback=on_request)
+    channel.basic_qos(prefetch_count=1)
+    channel.basic_consume(queue="events", on_message_callback=on_request)
 
-print(" [x] Awaiting RPC requests")
-channel.start_consuming()
+    print(" [x] Awaiting RPC requests")
+    channel.start_consuming()
+except Exception as e:
+    print(f"Try connect to {RMQ_HOST}:{RMQ_PORT}")
