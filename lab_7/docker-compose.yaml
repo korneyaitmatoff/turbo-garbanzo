@@ -29,8 +29,8 @@ services:
       REPORT_PORT: 8082
       S3_HOST: minio
       S3_PORT: 9000
-      ACCESS_KEY: 6UY177f4XBwz40sB6NMJ
-      SECRET_KEY: 6HaIpkOZ9CUvW4OqcqFJBnzZuKIs59FfPANMtKkf
+      ACCESS_KEY: user
+      SECRET_KEY: password
       RMQ_HOST: rabbitmq
       RMQ_PORT: 5672
     ports:
@@ -47,8 +47,8 @@ services:
       API_PORT: 8081
       S3_HOST: minio
       S3_PORT: 9000
-      ACCESS_KEY: 6UY177f4XBwz40sB6NMJ
-      SECRET_KEY: 6HaIpkOZ9CUvW4OqcqFJBnzZuKIs59FfPANMtKkf
+      ACCESS_KEY: user
+      SECRET_KEY: password
       RMQ_HOST: rabbitmq
       RMQ_PORT: 5672
 

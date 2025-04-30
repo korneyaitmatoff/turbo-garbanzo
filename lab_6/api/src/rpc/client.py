@@ -50,4 +50,6 @@ class RpcClient:
         while self.response is None:
             self.connection.process_data_events()
 
+        self.channel.close()
+
         return self.response.decode()

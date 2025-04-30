@@ -29,8 +29,8 @@ services:
       REPORT_PORT: 8082
       S3_HOST: minio
       S3_PORT: 9000
-      ACCESS_KEY: 6UY177f4XBwz40sB6NMJ
-      SECRET_KEY: 6HaIpkOZ9CUvW4OqcqFJBnzZuKIs59FfPANMtKkf
+      ACCESS_KEY: user
+      SECRET_KEY: password
     ports:
       - "8081:8081"
 
@@ -45,8 +45,8 @@ services:
       API_PORT: 8081
       S3_HOST: minio
       S3_PORT: 9000
-      ACCESS_KEY: 6UY177f4XBwz40sB6NMJ
-      SECRET_KEY: 6HaIpkOZ9CUvW4OqcqFJBnzZuKIs59FfPANMtKkf
+      ACCESS_KEY: user
+      SECRET_KEY: password
 
   minio:
     image: bitnami/minio:latest
@@ -59,3 +59,4 @@ services:
       MINIO_DEFAULT_BUCKETS: reports
     volumes:
       - /tmp/docker/s3:/tmp/s3
+      - ./init-minio.sh:/docker-entrypoint-initdb.d/init-minio.sh
