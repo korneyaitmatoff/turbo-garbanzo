@@ -11,7 +11,7 @@ app = FastAPI()
 
 
 @app.get(path="/")
-def get():
+async def get():
     try:
         return JSONResponse(
             status_code=200,
@@ -25,7 +25,7 @@ def get():
 
 
 @app.get(path="/{uuid}")
-def get_by_uuid(uuid: str):
+async def get_by_uuid(uuid: str):
     try:
         data = select_by_uuid(uuid=uuid)
 
@@ -41,7 +41,7 @@ def get_by_uuid(uuid: str):
 
 
 @app.post(path="/")
-def post(data: Car):
+async def post(data: Car):
     try:
         insert(
             data=data
@@ -53,7 +53,7 @@ def post(data: Car):
 
 
 @app.put(path="/{uuid}")
-def put(uuid: str, data: Car):
+async def put(uuid: str, data: Car):
     try:
         update(
             uuid=uuid,
@@ -66,7 +66,7 @@ def put(uuid: str, data: Car):
 
 
 @app.delete(path="/{uuid}")
-def delete(uuid: str):
+async def delete(uuid: str):
     try:
         delete_by_uuid(
             uuid=uuid,
@@ -78,7 +78,7 @@ def delete(uuid: str):
 
 
 @app.get(path="/report/")
-def get_report():
+async def get_report():
     try:
         rpc_client = RpcClient(
             host=RMQ_HOST,
